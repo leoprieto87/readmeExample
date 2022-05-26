@@ -2647,6 +2647,7 @@ curl --request POST \
 	}
 }'
 ```
+<style>
 .markdown-body .rdmd-table {
   --table-text: black;
   --table-head: #5b1c9f;
@@ -2655,3 +2656,4 @@ curl --request POST \
   --table-edges: rgba(34, 5, 64, .5);
   --table-row: white;
 }
+</style>
