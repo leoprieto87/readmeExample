@@ -79,7 +79,7 @@ VtexIdclientAutCookie: {authToken}
 |:-----|:--------:|------:|
 | Aprovado  | `'aproved'` | "Usuário foi aceito na regra solicitada" |
 | Negado   |  `'denied'`  |   "O usuário está na lista de rejeição e não pode ser aprovado." |
-| Indefinido   | `'undefined'` | "RejectionList validation error", "Rule id not found", "Input validation failed. Not valid rule pattern." Isso ocorre pois o e-mail ou o id da regra solicitada pode estar com erro ou não foi encontrada.  |
+| Indefinido   | `'undefined'` | "RejectionList validation error" <br /> "Rule id not found" <br /> "Input validation failed. Not valid rule pattern." <br /> Isso ocorre pois o e-mail ou o id da regra solicitada pode estar com erro ou não foi encontrada.  |
 
 
 
@@ -99,7 +99,7 @@ statusDescription: "denied",
 aditionalInfo: dataFromRejectionEntity.aditionalInfo ||"O usuário está na lista de rejeição e não pode ser aprovado."
 
 ```
-<strong>Error</strong>
+<strong>Undefined</strong>
 
 ``` javascript
 ruleId: this.id,
@@ -2647,13 +2647,3 @@ curl --request POST \
 	}
 }'
 ```
-<style>
-.markdown-body .rdmd-table {
-  --table-text: black;
-  --table-head: #5b1c9f;
-  --table-head-text: white;
-  --table-stripe: #f0eaf7;
-  --table-edges: rgba(34, 5, 64, .5);
-  --table-row: white;
-}
-</style>
