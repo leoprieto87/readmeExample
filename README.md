@@ -77,44 +77,33 @@ VtexIdclientAutCookie: {authToken}
 
 | Retornos |  Body  | Info |
 |:-----|:--------:|------:|
-|  Aprovado  | `'aproved'` | $1600 |
-| Negado   |  `denied`  |   $12 |
-| L2   | _italic_ |    $1 |
+| Aprovado  | `'aproved'` | "Usuário foi aceito na regra solicitada" |
+| Negado   |  `'denied'`  |   "O usuário está na lista de rejeição e não pode ser aprovado." |
+| Erro   | `'error'` | "RejectionList validation error". Isso ocorre pois o e-mail ou o id da regra solicitada pode estar com erro.  |
+
+
+<strong>Aproved</strong>
 
 ``` javascript
-response[ 
- {
- ruleId:1, 
- status: 'aproved', 
- aditionalInfo: '' 
- }
-] 
+ruleId: this.id,
+statusDescription: "approved",
+aditionalInfo: ""
 ```
 
-<table>
-
-<strong>Sucesso</strong>
+<strong>Denied</strong>
 
 ``` javascript
 ruleId: this.id,
 statusDescription: "denied",
-aditionalInfo: dataFromRejectionEntity.aditionalInfo || aditionalInfoDenie
-```
+aditionalInfo: dataFromRejectionEntity.aditionalInfo || "O usuário está na lista de rejeição e não pode ser aprovado."
 
-<strong>Negado</strong>
+```
+<strong>Error</strong>
 
 ``` javascript
 ruleId: this.id,
 statusDescription: "denied",
-aditionalInfo: dataFromRejectionEntity.aditionalInfo || aditionalInfoDenie
-
-```
-<strong>Negado</strong>
-
-``` javascript
-ruleId: this.id,
-statusDescription: "denied",
-aditionalInfo: dataFromRejectionEntity.aditionalInfo || aditionalInfoDenie
+aditionalInfo: "RejectionList validation error"
 ```
 <p>
     O campo <strong>aditionalInfo</strong> é referente a alguma informação que o usuário possa conter, sendo preenchido no momento do cadastro na tabela de <strong>rejection_list</strong>, caso não tenha, retornaremos um objeto vazio.
