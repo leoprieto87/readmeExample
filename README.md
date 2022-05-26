@@ -76,7 +76,7 @@ VtexIdclientAutCookie: {authToken}
 ## Retornos e tratamentos
 
 | Retornos |  Body  | Info |
-|:-----|:--------:|------:|
+|:-----|:--------:|:-----|
 | Aprovado  | `'aproved'` | "Usuário foi aceito na regra solicitada" |
 | Negado   |  `'denied'`  |   "O usuário está na lista de rejeição e não pode ser aprovado." |
 | Indefinido   | `'undefined'` | "RejectionList validation error" <br /> "Rule id not found" <br /> "Input validation failed. Not valid rule pattern." <br /> Isso ocorre pois o e-mail ou o id da regra solicitada pode estar com erro ou não foi encontrada.  |
