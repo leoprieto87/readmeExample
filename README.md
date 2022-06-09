@@ -30,15 +30,6 @@ Após a instalação é preciso realizar o comando 'link' da vtex:
 $ vtex link
 ```
 
-## ☕ Utilizando 
-
-Para utilizar o serviço  necessário acessar o endpoit: 
-
-``` javascript
-https://{workspace}--{account}.myvtex.com/orderformmediator/validator
-
-```
-
 ## Headers
 
 ``` javascript
@@ -47,40 +38,55 @@ https://{workspace}--{account}.myvtex.com/orderformmediator/validator
 },
 acceptJson: {
     accept: 'application/json'
-},
-VtexIdclientAutCookie: {authToken}
-```     
-## Body
+}
+```  
+
+## ☕ Endpoint de validação 
+
+Para utilizar o serviço de validação acesse o endpoit: 
+
+``` javascript
+https://{workspace}--{account}.myvtex.com/orderformmediator/validator
+
+```
+<p>
+    <strong>GET</strong> <br />
+    <strong>body:</strong> <br />
+</p>
 
 ``` json
 {
 	"rules": [
 		{
-			"id": 1,
+			"id": "c1574e4c-e732-11ec-835d-16d255cd11e9",
 			"externalTrigger": false
 		}
 	],
-	"orderForm": {"CONTEÚDO DO ORDERFORM"}
+	"orderForm": {
+		"clientProfileData": {
+				"email": "testando2@testando.com.br"
+		}
+	}
 }
 ```
+
 <p>
     <strong>RULES:</strong> Refere-se ao id da regra que deseja consultar.
     Nesse momento, o ID 1 irá se referir a regra de ‘rejection_list’ cadastrada nessa entidade, pra isso, criaremos uma entidade no masterData chamada rules.
 </p>
 <p>
     <strong>ORDERFORM:</strong> Dados referente ao pedido que está sendo feito, contendo email de usuários, informações de produtos, etc.
+    No exemplo acima utilizamos somente o campo E-mail, porém pode ser passado o OrderForm completo.
 </p>
 
-
-
-## Retornos e tratamentos
+## Retornos da validação
 
 | Retornos |  Body  | Info |
-|:-----|:--------:|:-----|
+| ----- | -------- | ------ |
 | Aprovado  | `'aproved'` | "Usuário foi aceito na regra solicitada" |
 | Negado   |  `'denied'`  |   "O usuário está na lista de rejeição e não pode ser aprovado." |
 | Indefinido   | `'undefined'` | "RejectionList validation error" <br /> "Rule id not found" <br /> "Input validation failed. Not valid rule pattern." <br /> Isso ocorre pois o e-mail ou o id da regra solicitada pode estar com erro ou não foi encontrada.  |
-
+| Requisisão inválida   | `'bad request'` | A regra pôde ser instanciada mas houve uma falha no seu processo interno de execução |
 
 
 <strong>Aproved</strong>
@@ -99,6 +105,7 @@ statusDescription: "denied",
 aditionalInfo: dataFromRejectionEntity.aditionalInfo ||"O usuário está na lista de rejeição e não pode ser aprovado."
 
 ```
+
 <strong>Undefined</strong>
 
 ``` javascript
@@ -106,2544 +113,577 @@ ruleId: this.id,
 statusDescription: "undefined",
 aditionalInfo: "RejectionList validation error"
 ```
+
+<strong>Bad Request</strong>
+
+``` javascript
+ruleId: this.id,
+statusDescription: "bad request",
+aditionalInfo: ""
+```
 <p>
     O campo <strong>aditionalInfo</strong> é referente a alguma informação que o usuário possa conter, sendo preenchido no momento do cadastro na tabela de <strong>rejection_list</strong>, caso não tenha, retornaremos um objeto vazio.
 </p>
 
-## POSTMAN
 
-Para incluir um e-mail na Rejection List, utilize o curl para configurar via Postman:
+## ☕ Endpoint de Rules 
 
-``` curl
-curl --request POST \
-  --url https://compracertamkpqa--compracertamkpqa.myvtex.com/validator \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"rules": [
-		{
-			"id": 1,
-			"externalTrigger": false
-		}
-	],
-	"orderForm": {
-		"orderFormId": "b96db71ed88c48aa961d9f83fef409b5",
-		"salesChannel": "1",
-		"loggedIn": false,
-		"isCheckedIn": false,
-		"storeId": null,
-		"checkedInPickupPointId": null,
-		"allowManualPrice": false,
-		"canEditData": true,
-		"userProfileId": null,
-		"userType": null,
-		"ignoreProfileData": false,
-		"value": 35999,
-		"messages": [],
-		"items": [],
-		"selectableGifts": [],
-		"totalizers": [
-		],
-		"shippingData": {
-			"address": {
-				"addressType": "residential",
-				"receiverName": "Testando Corebiz",
-				"addressId": "4915104690000",
-				"isDisposable": true,
-				"postalCode": "01130-000",
-				"city": "São Paulo",
-				"state": "SP",
-				"country": "BRA",
-				"street": "Rua Anhaia",
-				"number": "55",
-				"neighborhood": "Bom Retiro",
-				"complement": "",
-				"reference": null,
-				"geoCoordinates": [
-					-46.64506149291992,
-					-23.5242919921875
-				]
-			},
-			"logisticsInfo": [
-				{
-					"itemIndex": 0,
-					"selectedSla": "Retirada Funcionário",
-					"selectedDeliveryChannel": "delivery",
-					"addressId": "4915104690000",
-					"slas": [
-						{
-							"id": "Retirada Funcionário",
-							"deliveryChannel": "delivery",
-							"name": "Retirada Funcionário",
-							"deliveryIds": [
-								{
-									"courierId": "124efcc",
-									"warehouseId": "1_1",
-									"dockId": "118863c",
-									"courierName": "CDSP Retira (Retirada) v20200603",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "0bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 0,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": false,
-								"friendlyName": null,
-								"address": null,
-								"additionalInfo": null,
-								"dockId": null
-							},
-							"pickupPointId": null,
-							"pickupDistance": 0,
-							"polygonName": "",
-							"transitTime": "0bd"
-						},
-						{
-							"id": "Normal",
-							"deliveryChannel": "delivery",
-							"name": "Normal",
-							"deliveryIds": [
-								{
-									"courierId": "11f5703",
-									"warehouseId": "1_1",
-									"dockId": "15e4fb3",
-									"courierName": "CDSP Total Standard.1 (Normal) v20220202",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "3bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 863,
-							"listPrice": 863,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": false,
-								"friendlyName": null,
-								"address": null,
-								"additionalInfo": null,
-								"dockId": null
-							},
-							"pickupPointId": null,
-							"pickupDistance": 0,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "Econômica",
-							"deliveryChannel": "delivery",
-							"name": "Econômica",
-							"deliveryIds": [
-								{
-									"courierId": "19be782",
-									"warehouseId": "1_1",
-									"dockId": "1122b4c",
-									"courierName": "CDSP Mandaê F-Combate.01 (Econômica) v20211019",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "4bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 884,
-							"listPrice": 884,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": false,
-								"friendlyName": null,
-								"address": null,
-								"additionalInfo": null,
-								"dockId": null
-							},
-							"pickupPointId": null,
-							"pickupDistance": 0,
-							"polygonName": "",
-							"transitTime": "3bd"
-						},
-						{
-							"id": "Urgente",
-							"deliveryChannel": "delivery",
-							"name": "Urgente",
-							"deliveryIds": [
-								{
-									"courierId": "182344d",
-									"warehouseId": "1_1",
-									"dockId": "118863c",
-									"courierName": "CDSP Loggi Corp (Urgente) v20211005",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "3h",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 1990,
-							"listPrice": 1990,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": false,
-								"friendlyName": null,
-								"address": null,
-								"additionalInfo": null,
-								"dockId": null
-							},
-							"pickupPointId": null,
-							"pickupDistance": 0,
-							"polygonName": "B2C001-05KM",
-							"transitTime": "3h"
-						},
-						{
-							"id": "ShiptoStore (hig011)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (hig011)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Pátio Higienopolis",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "hig011",
-									"isDisposable": true,
-									"postalCode": "01238-001",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Avenida Higienópolis",
-									"number": "618",
-									"neighborhood": "Higienópolis",
-									"complement": "LOJA 162/163/164 - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.65763,
-										-23.54225
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_hig011",
-							"pickupDistance": 2.372589349746704,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (cno009)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (cno009)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1382,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Center Norte",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "cno009",
-									"isDisposable": true,
-									"postalCode": "02047-050",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Travessa Casalbuono",
-									"number": "120",
-									"neighborhood": "Vila Guilherme",
-									"complement": "LOJA 617 / LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.61838,
-										-23.51553
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_cno009",
-							"pickupDistance": 2.889571189880371,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (bou020)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (bou020)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Bourbon",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "bou020",
-									"isDisposable": true,
-									"postalCode": "05005-001",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Rua Palestra Itália",
-									"number": "500",
-									"neighborhood": "Perdizes",
-									"complement": "2o. Piso / LOJA 137 - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.68095,
-										-23.5267
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_bou020",
-							"pickupDistance": 3.668722152709961,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (CSP064)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (CSP064)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shopping Cidade São Paulo",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "CSP064",
-									"isDisposable": true,
-									"postalCode": "01310-000",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Avenida Paulista",
-									"number": "1230",
-									"neighborhood": "Bela Vista",
-									"complement": "LOJA SUC 0109 - PAVMTO TERREO - LOJA SHOULDER                               ",
-									"reference": null,
-									"geoCoordinates": [
-										-46.65269,
-										-23.56352
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_CSP064",
-							"pickupDistance": 4.430738925933838,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (OFR016)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (OFR016)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Oscar Freire",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "OFR016",
-									"isDisposable": true,
-									"postalCode": "01426-001",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Rua Oscar Freire",
-									"number": "819",
-									"neighborhood": "Cerqueira César",
-									"complement": "LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.67572,
-										-23.5551
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_OFR016",
-							"pickupDistance": 4.637185096740723,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (eld042)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (eld042)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Eldorado",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "eld042",
-									"isDisposable": true,
-									"postalCode": "05402-600",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Avenida Rebouças",
-									"number": "3970",
-									"neighborhood": "Pinheiros",
-									"complement": "LOJA Nº 210B 1º PISO - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.69571,
-										-23.57246
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_eld042",
-							"pickupDistance": 7.4392499923706055,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (MOO087)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (MOO087)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Mooca Plaza",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "MOO087",
-									"isDisposable": true,
-									"postalCode": "03126-000",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Rua Capitão Pacheco e Chaves",
-									"number": "313",
-									"neighborhood": "Vila Prudente",
-									"complement": "Pavmto 1 luc / Suc 1034  - LOJA SHOULDER ",
-									"reference": null,
-									"geoCoordinates": [
-										-46.59379,
-										-23.58135
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_MOO087",
-							"pickupDistance": 8.219890594482422,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (jki037)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (jki037)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder JK Iguatemi",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "jki037",
-									"isDisposable": true,
-									"postalCode": "04543-011",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Avenida Presidente Juscelino Kubitschek",
-									"number": "2041",
-									"neighborhood": "Vila Nova Conceição",
-									"complement": " Lojas Nº 364/365 2º Pavimento  - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.69004,
-										-23.59073
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_jki037",
-							"pickupDistance": 8.694519996643066,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (VOL051)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (VOL051)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Vila Olímpia",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "VOL051",
-									"isDisposable": true,
-									"postalCode": "04547-000",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Rua Olimpíadas",
-									"number": "360",
-									"neighborhood": "Itaim Bibi",
-									"complement": "LOJA 203 - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.68642,
-										-23.59539
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_VOL051",
-							"pickupDistance": 8.959437370300293,
-							"polygonName": "",
-							"transitTime": "2bd"
-						},
-						{
-							"id": "ShiptoStore (vlo049)",
-							"deliveryChannel": "pickup-in-point",
-							"name": "ShiptoStore (vlo049)",
-							"deliveryIds": [
-								{
-									"courierId": "1470685",
-									"warehouseId": "1_1",
-									"dockId": "1601a07",
-									"courierName": "CDSP Total Retira Loja (ShiptoStore) v20211006",
-									"quantity": 1,
-									"kitItemDetails": []
-								}
-							],
-							"shippingEstimate": "6bd",
-							"shippingEstimateDate": null,
-							"lockTTL": null,
-							"availableDeliveryWindows": [],
-							"deliveryWindow": null,
-							"price": 0,
-							"listPrice": 1080,
-							"tax": 0,
-							"pickupStoreInfo": {
-								"isPickupStore": true,
-								"friendlyName": "Shoulder Villa-Lobos",
-								"address": {
-									"addressType": "pickup",
-									"receiverName": null,
-									"addressId": "vlo049",
-									"isDisposable": true,
-									"postalCode": "04795-100",
-									"city": "São Paulo",
-									"state": "SP",
-									"country": "BRA",
-									"street": "Avenida das Nações Unidas",
-									"number": "4777      ",
-									"neighborhood": "Vila Almeida",
-									"complement": "LOTE A - LOJA 245/246 C - 2º PISO - LOJA SHOULDER",
-									"reference": null,
-									"geoCoordinates": [
-										-46.73159,
-										-23.54669
-									]
-								},
-								"additionalInfo": "",
-								"dockId": "1601a07"
-							},
-							"pickupPointId": "1_vlo049",
-							"pickupDistance": 9.166008949279785,
-							"polygonName": "",
-							"transitTime": "2bd"
-						}
-					],
-					"shipsTo": [
-						"BRA"
-					],
-					"itemId": "2090417",
-					"deliveryChannels": [
-						{
-							"id": "delivery"
-						},
-						{
-							"id": "pickup-in-point"
-						}
-					]
-				}
-			],
-			"selectedAddresses": [
-				{
-					"addressType": "residential",
-					"receiverName": "Testando Corebiz",
-					"addressId": "4915104690000",
-					"isDisposable": true,
-					"postalCode": "01130-000",
-					"city": "São Paulo",
-					"state": "SP",
-					"country": "BRA",
-					"street": "Rua Anhaia",
-					"number": "55",
-					"neighborhood": "Bom Retiro",
-					"complement": "",
-					"reference": null,
-					"geoCoordinates": [
-						-46.64506149291992,
-						-23.5242919921875
-					]
-				}
-			],
-			"availableAddresses": [
-				{
-					"addressType": "residential",
-					"receiverName": "Testando Corebiz",
-					"addressId": "4915104690000",
-					"isDisposable": true,
-					"postalCode": "01130-000",
-					"city": "São Paulo",
-					"state": "SP",
-					"country": "BRA",
-					"street": "Rua Anhaia",
-					"number": "55",
-					"neighborhood": "Bom Retiro",
-					"complement": "",
-					"reference": null,
-					"geoCoordinates": [
-						-46.64506149291992,
-						-23.5242919921875
-					]
-				}
-			],
-			"pickupPoints": [
-				{
-					"friendlyName": "Shoulder Pátio Higienopolis",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "hig011",
-						"isDisposable": true,
-						"postalCode": "01238-001",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Avenida Higienópolis",
-						"number": "618",
-						"neighborhood": "Higienópolis",
-						"complement": "LOJA 162/163/164 - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.65763,
-							-23.54225
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_hig011",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Center Norte",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "cno009",
-						"isDisposable": true,
-						"postalCode": "02047-050",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Travessa Casalbuono",
-						"number": "120",
-						"neighborhood": "Vila Guilherme",
-						"complement": "LOJA 617 / LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.61838,
-							-23.51553
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_cno009",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "00:00:00",
-							"ClosingTime": "00:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Bourbon",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "bou020",
-						"isDisposable": true,
-						"postalCode": "05005-001",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Rua Palestra Itália",
-						"number": "500",
-						"neighborhood": "Perdizes",
-						"complement": "2o. Piso / LOJA 137 - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.68095,
-							-23.5267
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_bou020",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shopping Cidade São Paulo",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "CSP064",
-						"isDisposable": true,
-						"postalCode": "01310-000",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Avenida Paulista",
-						"number": "1230",
-						"neighborhood": "Bela Vista",
-						"complement": "LOJA SUC 0109 - PAVMTO TERREO - LOJA SHOULDER                               ",
-						"reference": null,
-						"geoCoordinates": [
-							-46.65269,
-							-23.56352
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_CSP064",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Oscar Freire",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "OFR016",
-						"isDisposable": true,
-						"postalCode": "01426-001",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Rua Oscar Freire",
-						"number": "819",
-						"neighborhood": "Cerqueira César",
-						"complement": "LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.67572,
-							-23.5551
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_OFR016",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "20:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Eldorado",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "eld042",
-						"isDisposable": true,
-						"postalCode": "05402-600",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Avenida Rebouças",
-						"number": "3970",
-						"neighborhood": "Pinheiros",
-						"complement": "LOJA Nº 210B 1º PISO - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.69571,
-							-23.57246
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_eld042",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Mooca Plaza",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "MOO087",
-						"isDisposable": true,
-						"postalCode": "03126-000",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Rua Capitão Pacheco e Chaves",
-						"number": "313",
-						"neighborhood": "Vila Prudente",
-						"complement": "Pavmto 1 luc / Suc 1034  - LOJA SHOULDER ",
-						"reference": null,
-						"geoCoordinates": [
-							-46.59379,
-							-23.58135
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_MOO087",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder JK Iguatemi",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "jki037",
-						"isDisposable": true,
-						"postalCode": "04543-011",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Avenida Presidente Juscelino Kubitschek",
-						"number": "2041",
-						"neighborhood": "Vila Nova Conceição",
-						"complement": " Lojas Nº 364/365 2º Pavimento  - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.69004,
-							-23.59073
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_jki037",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Vila Olímpia",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "VOL051",
-						"isDisposable": true,
-						"postalCode": "04547-000",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Rua Olimpíadas",
-						"number": "360",
-						"neighborhood": "Itaim Bibi",
-						"complement": "LOJA 203 - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.68642,
-							-23.59539
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_VOL051",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				},
-				{
-					"friendlyName": "Shoulder Villa-Lobos",
-					"address": {
-						"addressType": "pickup",
-						"receiverName": null,
-						"addressId": "vlo049",
-						"isDisposable": true,
-						"postalCode": "04795-100",
-						"city": "São Paulo",
-						"state": "SP",
-						"country": "BRA",
-						"street": "Avenida das Nações Unidas",
-						"number": "4777      ",
-						"neighborhood": "Vila Almeida",
-						"complement": "LOTE A - LOJA 245/246 C - 2º PISO - LOJA SHOULDER",
-						"reference": null,
-						"geoCoordinates": [
-							-46.73159,
-							-23.54669
-						]
-					},
-					"additionalInfo": "",
-					"id": "1_vlo049",
-					"businessHours": [
-						{
-							"DayOfWeek": 0,
-							"OpeningTime": "14:00:00",
-							"ClosingTime": "20:00:00"
-						},
-						{
-							"DayOfWeek": 1,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 2,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 3,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 4,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 5,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						},
-						{
-							"DayOfWeek": 6,
-							"OpeningTime": "10:00:00",
-							"ClosingTime": "22:00:00"
-						}
-					]
-				}
-			]
-		},
-		"clientProfileData": {
-			"email": "testando2@testando.com.br",
-			"firstName": "Testando",
-			"lastName": "Corebiz",
-			"document": "12356232702",
-			"documentType": "cpf",
-			"phone": "+5521969636218",
-			"corporateName": null,
-			"tradeName": null,
-			"corporateDocument": null,
-			"stateInscription": "",
-			"corporatePhone": null,
-			"isCorporate": false,
-			"profileCompleteOnLoading": false,
-			"profileErrorOnLoading": false,
-			"customerClass": null
-		},
-		"paymentData": {
-			"updateStatus": "updated",
-			"installmentOptions": [
-				{
-					"paymentSystem": "1",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 2,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 17999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 2,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 17999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 3,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 11999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 3,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 11999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 4,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 8999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 4,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 8999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 5,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 7199,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 5,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 7199,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 6,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 6,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 7,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5142,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 7,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5142,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "2",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 2,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 17999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 2,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 17999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 3,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 11999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 3,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 11999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 4,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 8999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 4,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 8999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 5,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 7199,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 5,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 7199,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 6,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 6,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 7,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5142,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 7,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5142,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "4",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 2,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 17999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 2,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 17999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 3,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 11999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 3,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 11999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 4,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 8999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 4,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 8999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 5,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 7199,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 5,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 7199,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 6,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 6,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 7,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5142,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 7,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5142,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "8",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 2,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 17999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 2,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 17999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 3,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 11999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 3,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 11999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 4,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 8999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 4,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 8999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 5,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 7199,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 5,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 7199,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 6,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 6,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 7,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5142,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 7,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5142,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "9",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 2,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 17999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 2,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 17999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 3,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 11999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 3,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 11999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 4,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 8999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 4,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 8999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 5,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 7199,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 5,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 7199,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 6,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 6,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5999,
-									"total": 35999
-								}
-							]
-						},
-						{
-							"count": 7,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 5142,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 7,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 5142,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "16",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "72",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						}
-					]
-				},
-				{
-					"paymentSystem": "125",
-					"bin": null,
-					"paymentName": null,
-					"paymentGroupName": null,
-					"value": 35999,
-					"installments": [
-						{
-							"count": 1,
-							"hasInterestRate": false,
-							"interestRate": 0,
-							"value": 35999,
-							"total": 35999,
-							"sellerMerchantInstallments": [
-								{
-									"id": "SHOULDER",
-									"count": 1,
-									"hasInterestRate": false,
-									"interestRate": 0,
-									"value": 35999,
-									"total": 35999
-								}
-							]
-						}
-					]
-				}
-			],
-			"paymentSystems": [
-				{
-					"id": 1,
-					"name": "American Express",
-					"groupName": "creditCardPaymentGroup",
-					"validator": {
-						"regex": "^3[47][0-9]{13}$",
-						"mask": "9999 999999 99999",
-						"cardCodeRegex": "^[0-9]{4}$",
-						"cardCodeMask": "9999",
-						"weights": [
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1
-						],
-						"useCvv": true,
-						"useExpirationDate": true,
-						"useCardHolderName": true,
-						"useBillingAddress": true
-					},
-					"stringId": "1",
-					"template": "creditCardPaymentGroup-template",
-					"requiresDocument": true,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 2,
-					"name": "Visa",
-					"groupName": "creditCardPaymentGroup",
-					"validator": {
-						"regex": "^4[0-9]{15}$",
-						"mask": "9999 9999 9999 9999",
-						"cardCodeRegex": "^[0-9]{3}$",
-						"cardCodeMask": "999",
-						"weights": [
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2
-						],
-						"useCvv": true,
-						"useExpirationDate": true,
-						"useCardHolderName": true,
-						"useBillingAddress": true
-					},
-					"stringId": "2",
-					"template": "creditCardPaymentGroup-template",
-					"requiresDocument": true,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 4,
-					"name": "Mastercard",
-					"groupName": "creditCardPaymentGroup",
-					"validator": {
-						"regex": "^((5(([1-2]|[4-5])[0-9]{8}|0((1|6)([0-9]{7}))|3(0(4((0|[2-9])[0-9]{5})|([0-3]|[5-9])[0-9]{6})|[1-9][0-9]{7})))|((508116)\\d{4,10})|((502121)\\d{4,10})|((589916)\\d{4,10})|(2[0-9]{15})|(67[0-9]{14})|(506387)\\d{4,10})",
-						"mask": "9999 9999 9999 9999",
-						"cardCodeRegex": "^[0-9]{3}$",
-						"cardCodeMask": "999",
-						"weights": [
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2
-						],
-						"useCvv": true,
-						"useExpirationDate": true,
-						"useCardHolderName": true,
-						"useBillingAddress": true
-					},
-					"stringId": "4",
-					"template": "creditCardPaymentGroup-template",
-					"requiresDocument": true,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 8,
-					"name": "Hipercard",
-					"groupName": "creditCardPaymentGroup",
-					"validator": {
-						"regex": "^606282|^3841(?:[0|4|6]{1})0",
-						"mask": "9999999999999999999",
-						"cardCodeRegex": "^[0-9]{3}$",
-						"cardCodeMask": "999",
-						"weights": [
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							1,
-							1,
-							1
-						],
-						"useCvv": true,
-						"useExpirationDate": true,
-						"useCardHolderName": true,
-						"useBillingAddress": true
-					},
-					"stringId": "8",
-					"template": "creditCardPaymentGroup-template",
-					"requiresDocument": true,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 9,
-					"name": "Elo",
-					"groupName": "creditCardPaymentGroup",
-					"validator": {
-						"regex": "^(50(67(0[78]|1[5789]|2[012456789]|3[01234569]|4[0-7]|53|7[4-8])|9(0(0[0-9]|1[34]|2[0-7]|3[0359]|4[01235678]|5[01235789]|6[0-9]|7[01346789]|8[01234789]|9[123479])|1(0[34568]|4[6-9]|5[1-8]|8[356789])|2(2[0-2]|5[78]|6[1-9]|7[0-9]|8[01235678]|90)|357|4(0[7-9]|1[0-9]|2[0-2]|31|5[7-9]|6[0-6]|84)|55[01]|636|7(2[2-9]|6[5-9])))|4(0117[89]|3(1274|8935)|5(1416|7(393|63[12])))|6(27780|36368|5(0(0(3[12356789]|4[0-7]|7[78])|4(0[6-9]|1[0234]|2[2-9]|3[045789]|8[5-9]|9[0-9])|5(0[012346789]|1[0-9]|2[0-9]|3[0178]|5[2-9]|6[0-6]|7[7-9]|8[0-8]|9[1-8])|72[0-7]|9(0[1-9]|1[0-9]|2[0128]|3[89]|4[6-9]|5[0145]|6[235678]|71))|16(5[2-9]|6[0-9]|7[01456789])|50(0[0-9]|1[02345678]|36|5[1267]))))\\d{0,13}$",
-						"mask": "9999 9999 9999 9999",
-						"cardCodeRegex": "^[0-9]{3}$",
-						"cardCodeMask": "999",
-						"weights": [
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2,
-							1,
-							2
-						],
-						"useCvv": true,
-						"useExpirationDate": true,
-						"useCardHolderName": true,
-						"useBillingAddress": true
-					},
-					"stringId": "9",
-					"template": "creditCardPaymentGroup-template",
-					"requiresDocument": true,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 16,
-					"name": "Vale",
-					"groupName": "giftCardPaymentGroup",
-					"validator": {
-						"regex": null,
-						"mask": null,
-						"cardCodeRegex": null,
-						"cardCodeMask": null,
-						"weights": null,
-						"useCvv": false,
-						"useExpirationDate": false,
-						"useCardHolderName": false,
-						"useBillingAddress": false
-					},
-					"stringId": "16",
-					"template": "giftCardPaymentGroup-template",
-					"requiresDocument": false,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 125,
-					"name": "Pix",
-					"groupName": "instantPaymentPaymentGroup",
-					"validator": {
-						"regex": null,
-						"mask": null,
-						"cardCodeRegex": null,
-						"cardCodeMask": null,
-						"weights": null,
-						"useCvv": false,
-						"useExpirationDate": false,
-						"useCardHolderName": false,
-						"useBillingAddress": false
-					},
-					"stringId": "125",
-					"template": "instantPaymentPaymentGroup-template",
-					"requiresDocument": false,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				},
-				{
-					"id": 72,
-					"name": "PicPay",
-					"groupName": "picPayPaymentGroup",
-					"validator": {
-						"regex": null,
-						"mask": null,
-						"cardCodeRegex": null,
-						"cardCodeMask": null,
-						"weights": null,
-						"useCvv": false,
-						"useExpirationDate": false,
-						"useCardHolderName": false,
-						"useBillingAddress": false
-					},
-					"stringId": "72",
-					"template": "picPayPaymentGroup-template",
-					"requiresDocument": false,
-					"displayDocument": false,
-					"isCustom": false,
-					"description": null,
-					"requiresAuthentication": false,
-					"dueDate": "2022-04-20T17:11:01.3735119Z",
-					"availablePayments": null
-				}
-			],
-			"payments": [
-				{
-					"paymentSystem": "2",
-					"bin": null,
-					"accountId": null,
-					"tokenId": null,
-					"installments": null,
-					"referenceValue": 35999,
-					"value": 35999,
-					"merchantSellerPayments": [
-						{
-							"id": "SHOULDER",
-							"installments": null,
-							"referenceValue": 35999,
-							"value": 35999,
-							"interestRate": null,
-							"installmentValue": 0
-						}
-					]
-				}
-			],
-			"giftCards": [],
-			"giftCardMessages": [],
-			"availableAccounts": [],
-			"availableTokens": [],
-			"availableAssociations": {}
-		},
-		"marketingData": {
-			"utmSource": null,
-			"utmMedium": null,
-			"utmCampaign": null,
-			"utmipage": null,
-			"utmiPart": null,
-			"utmiCampaign": null,
-			"coupon": null,
-			"marketingTags": [
-				"vtexSocialSelling"
-			]
-		},
-		"sellers": [
-			{
-				"id": "1",
-				"name": "Shoulder eCommerce",
-				"logo": ""
-			}
-		],
-		"clientPreferencesData": {
-			"locale": "pt-BR",
-			"optinNewsLetter": false
-		},
-		"commercialConditionData": null,
-		"storePreferencesData": {
-			"countryCode": "BRA",
-			"saveUserData": true,
-			"timeZone": "E. South America Standard Time",
-			"currencyCode": "BRL",
-			"currencyLocale": 1046,
-			"currencySymbol": "R$",
-			"currencyFormatInfo": {
-				"currencyDecimalDigits": 2,
-				"currencyDecimalSeparator": ",",
-				"currencyGroupSeparator": ".",
-				"currencyGroupSize": 3,
-				"startsWithCurrencySymbol": true
-			}
-		},
-		"giftRegistryData": null,
-		"openTextField": {
-			"value": null
-		},
-		"invoiceData": null,
-		"customData": null,
-		"itemMetadata": {
-			"items": [
-				{
-					"id": "2090417",
-					"seller": "1",
-					"name": "Kaftan jacquard fio dourado-off white-pp",
-					"skuName": "Kaftan jacquard fio dourado-off white-pp",
-					"productId": "2014666",
-					"refId": "2124189000079PP",
-					"ean": "2124189000079PP",
-					"imageUrl": "http://shoulder.vteximg.com.br/arquivos/ids/1910663-200-255/212418900_0079_010-KAFTAN-JACQUARD-FIO-DOURADO.jpg?v=637717235334900000",
-					"detailUrl": "/kaftan-jacquard-fio-dourado-212418900/p",
-					"assemblyOptions": []
-				}
-			]
-		},
-		"hooksData": null,
-		"ratesAndBenefitsData": {
-			"rateAndBenefitsIdentifiers": [
-				{
-					"id": "a0080acf-c2bb-4dfa-a449-a1e759baa534",
-					"name": "Frete Máximo",
-					"featured": false,
-					"description": "Promoção pra evitar cobranças de frete exorbitantes devido a inconsistências nas planilhas de frete.",
-					"matchedParameters": {
-						"slaIds": "econômica,normal"
-					},
-					"additionalInfo": null
-				}
-			],
-			"teaser": []
-		},
-		"subscriptionData": null,
-		"itemsOrdination": null,
-		"recaptchaKey": "6LdAUOAUAAAAAG8GfSFnEdE2t6Hwq4wnIFzJKa4e"
+Para utilizar o serviço de Rules acesse o endpoit: 
+
+``` javascript
+https://{workspace}--{account}.myvtex.com/orderformmediator/rules
+```
+<p>
+    <strong>HEADERS</strong> <br />
+</p>
+
+``` json
+{
+    "x-vtex-api-appkey": "[your-vtex-api-appkey]",
+    "x-vtex-api-apptoken": "[your-vtex-api-apptoken]"
+}
+```
+
+<p>
+    <strong>GET</strong> <br />
+    Para utilizar o método GET não é necessário um Body
+</p>
+
+![GET](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-GET-Body.png)
+
+<p>
+    <strong>Response</strong> <br />
+</p>
+
+``` json
+[
+	{
+		"id": "c1f84c6b-e732-11ec-835d-12de90dd8255",
+		"name": "rejectionList_copy",
+		"endpoint": null,
+		"active": false
 	}
-}'
+]
+```
+![GET](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-GET-Response.png)
+<!-- PRINT GET -->
+
+<p>
+    <strong>POST</strong> <br />
+    <strong>Body:</strong> <br />
+</p>
+
+``` json
+	{
+		"name": "Nova Regra",
+		"endpoint": null,
+		"active": true
+	}
+```
+![POST](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-POST-Body.png)
+
+<p>
+    <strong>Response</strong> <br />
+</p>
+
+``` json
+[
+	{
+		"id": "c1f84c6b-e732-11ec-835d-12de90dd8255",
+		"name": "rejectionList_copy",
+		"endpoint": null,
+		"active": false
+	}
+]
+```
+![POST](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-POST-Response.png)
+<!-- PRINT POST -->
+
+<p>
+    <strong>PATCH</strong> <br />
+    <strong>Body:</strong> <br />
+</p>
+
+``` json
+    {
+        "id": "e2113265-e81f-11ec-835d-162544423325",
+        "name": "Nova Regra Atualizada",
+        "endpoint": null,
+        "active": false
+	}
+```
+![PATCH](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-PATCH-Body.png)
+
+<p>
+    <strong>Response</strong> <br />
+</p>
+
+![PATCH](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-PATCH-Response.png)
+<!-- PRINT PATCH -->
+
+<p>
+    <strong>DEL</strong> <br />
+    <strong>Body:</strong> <br />
+</p>
+
+``` json
+    	{
+		"id": "36db21b3-e81f-11ec-835d-0ee0eccb1eb3"
+	}
+```
+![DELETE](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-DEL-Body.png)
+
+<p>
+    <strong>Response</strong> <br />
+</p>
+
+![DELETE](https://whirlpoolappstore.vtexassets.com/arquivos/Rules-DEL-Response.png)
+<!-- PRINT DEL -->
+
+## Utilizando a aplicação
+
+Para utilizar a aplicação via software (Postman, Insomnia, etc.) 
+Import o JSON abaixo para o seu programa de preferência
+
+``` json
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2022-06-09T18:42:07.510Z",
+    "__export_source": "insomnia.desktop.app:v2022.3.0",
+    "resources": [{
+        "_id": "req_f02c5588f5424b4eb75180dbe2cb1c02",
+        "parentId": "fld_655ccdca740c45e19be3f8cd984b21d1",
+        "modified": 1654716480659,
+        "created": 1652798963138,
+        "url": "{{ _.base_ulr }}/user-identification-services",
+        "name": "user-identification-services",
+        "description": "",
+        "method": "GET",
+        "body": {},
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415249.5,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "fld_655ccdca740c45e19be3f8cd984b21d1",
+        "parentId": "fld_5a85f29018ba4e56aa90bb78c2020f32",
+        "modified": 1654716299619,
+        "created": 1652798948032,
+        "name": "user-identification-services",
+        "description": "",
+        "environment": {},
+        "environmentPropertyOrder": null,
+        "metaSortKey": -1652798948032,
+        "_type": "request_group"
+    }, {
+        "_id": "fld_5a85f29018ba4e56aa90bb78c2020f32",
+        "parentId": "fld_07527411fe59462183d4cf741daa0ba7",
+        "modified": 1654718326386,
+        "created": 1647963746777,
+        "name": "orderformmediator",
+        "description": "",
+        "environment": {
+            "base_ulr": "https://whirlpoolappstore.myvtex.com/orderformmediator"
+        },
+        "environmentPropertyOrder": {
+            "&": ["base_ulr"]
+        },
+        "metaSortKey": -1647963746777,
+        "_type": "request_group"
+    }, {
+        "_id": "fld_07527411fe59462183d4cf741daa0ba7",
+        "parentId": "wrk_12c2b5256773445eb62fa3098896fc7e",
+        "modified": 1654714294956,
+        "created": 1647963708923,
+        "name": "Whilrpool",
+        "description": "",
+        "environment": {},
+        "environmentPropertyOrder": {},
+        "metaSortKey": -1647963708923,
+        "_type": "request_group"
+    }, {
+        "_id": "wrk_12c2b5256773445eb62fa3098896fc7e",
+        "parentId": null,
+        "modified": 1654719144821,
+        "created": 1628102005300,
+        "name": "ORDERFORM",
+        "description": "",
+        "scope": "collection",
+        "_type": "workspace"
+    }, {
+        "_id": "req_7eaaa3af3beb4c638a13d87d7e7c8e0c",
+        "parentId": "fld_655ccdca740c45e19be3f8cd984b21d1",
+        "modified": 1654799448634,
+        "created": 1653052283379,
+        "url": "{{ _.base_ulr }}/user-identification-services",
+        "name": "user-identification-services",
+        "description": "",
+        "method": "PATCH",
+        "body": {
+            "mimeType": "application/json",
+            "text": "{\n\t\"id\": \"0b207a17-e762-11ec-835d-16a7ac2ae94b\",\n\t\"serviceName\": \"service-4 update\",\n\t\"connectionData\": {\"x-api-key\":\"abc\"},\n\t\"active\": true\n}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_e6f9a609f26c4610beb6b8c752f555d9"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415240.125,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_5e8054c4d3dd4b649181625f803843f8",
+        "parentId": "fld_655ccdca740c45e19be3f8cd984b21d1",
+        "modified": 1654799447943,
+        "created": 1653077123284,
+        "url": "{{ _.base_ulr }}/user-identification-services",
+        "name": "user-identification-services",
+        "description": "",
+        "method": "DELETE",
+        "body": {
+            "mimeType": "application/json",
+            "text": "{\n\t\"id\": \"0b207a17-e762-11ec-835d-16a7ac2ae94b\"\n}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_7595ed61127d452aa4cfd2510a1138c0"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415235.4375,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_e45afe35eb9247a9996ce68b5d3da7b0",
+        "parentId": "fld_655ccdca740c45e19be3f8cd984b21d1",
+        "modified": 1654799447493,
+        "created": 1652798973602,
+        "url": "{{ _.base_ulr }}/user-identification-services",
+        "name": "user-identification-services",
+        "description": "",
+        "method": "POST",
+        "body": {
+            "mimeType": "application/json",
+            "text": "{\n\t\"serviceName\": \"service-4\",\n\t\"active\": true,\n\t\"connectionData\": {\"x-api-key\": \"abc\"}\n}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_7f2bb2b46a0b4cb5ad9019cce7758f05"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415199.5,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_e03e043fe32047178f0dfb1f7bb20028",
+        "parentId": "fld_4e9dcdf47ad64171aed83254b9c2fbde",
+        "modified": 1654715563507,
+        "created": 1651673528063,
+        "url": "{{ _.base_ulr }}/rules",
+        "name": "rules",
+        "description": "",
+        "method": "GET",
+        "body": {},
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415268.25,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "fld_4e9dcdf47ad64171aed83254b9c2fbde",
+        "parentId": "fld_5a85f29018ba4e56aa90bb78c2020f32",
+        "modified": 1651673485508,
+        "created": 1651673485508,
+        "name": "rules",
+        "description": "",
+        "environment": {},
+        "environmentPropertyOrder": null,
+        "metaSortKey": -1651673485508,
+        "_type": "request_group"
+    }, {
+        "_id": "req_3af4a478f02340e99d41b0aab932fc05",
+        "parentId": "fld_4e9dcdf47ad64171aed83254b9c2fbde",
+        "modified": 1654799332656,
+        "created": 1654715468636,
+        "url": "{{ _.base_ulr }}/rules",
+        "name": "rules",
+        "description": "",
+        "method": "PATCH",
+        "body": {
+            "mimeType": "application/json",
+            "text": "\t{\n\t\t\"id\": \"e2113265-e81f-11ec-835d-162544423325\",\n\t\t\"name\": \"Nova Regra Atualizada\",\n\t\t\"endpoint\": null,\n\t\t\"active\": false\n\t}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_825c80cf92674b9da2ba3662918f92b2"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415258.875,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_2af5fb8df63d485e9f1ee3d1df7b4a3a",
+        "parentId": "fld_4e9dcdf47ad64171aed83254b9c2fbde",
+        "modified": 1654799350062,
+        "created": 1654715782023,
+        "url": "{{ _.base_ulr }}/rules",
+        "name": "rules",
+        "description": "",
+        "method": "DELETE",
+        "body": {
+            "mimeType": "application/json",
+            "text": "\t{\n\t\t\"id\": \"36db21b3-e81f-11ec-835d-0ee0eccb1eb3\"\n\t}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_825c80cf92674b9da2ba3662918f92b2"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415254.1875,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_b785f935b98c4984bd2ed04574646b4b",
+        "parentId": "fld_4e9dcdf47ad64171aed83254b9c2fbde",
+        "modified": 1654799330921,
+        "created": 1651673503386,
+        "url": "{{ _.base_ulr }}/rules",
+        "name": "rules",
+        "description": "",
+        "method": "POST",
+        "body": {
+            "mimeType": "application/json",
+            "text": "\t{\n\t\t\"name\": \"Nova Regra\",\n\t\t\"endpoint\": null,\n\t\t\"active\": true\n\t}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "x-vtex-api-appkey",
+            "value": "vtexappkey-compracertamkpqa-BGKNMC",
+            "description": ""
+        }, {
+            "id": "pair_f591547080524c36bfed9f80282c016e",
+            "name": "x-vtex-api-apptoken",
+            "value": "KAZRKRCQFGFIEUDBOZGISLZBVTASEMVUQHGMXNRMINENGQGHFMZARRFZBYWQRKMTLKSXNREAITZFGLUENSNRNVDZBHKYRAVYAKCWYJUNIYRXRASQDSDYWUGQGSVFGFJH",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_7f2bb2b46a0b4cb5ad9019cce7758f05"
+        }],
+        "authentication": {},
+        "metaSortKey": -1650231415218.25,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "req_c10df8e9cd20474ea2d828eeee3a89f2",
+        "parentId": "fld_5a85f29018ba4e56aa90bb78c2020f32",
+        "modified": 1654714748715,
+        "created": 1647963984082,
+        "url": "{{ _.base_ulr }}/validator",
+        "name": "validator",
+        "description": "",
+        "method": "POST",
+        "body": {
+            "mimeType": "application/json",
+            "text": "{\n\t\"rules\": [\n\t\t{\n\t\t\t\"id\": \"5032e420-c76f-11ec-835d-163b125ee3a1\",\n\t\t\t\"externalTrigger\": false\n\t\t}\n\t],\n\t\"orderForm\": {\n\t\t\"clientProfileData\": {\n\t\t\t\t\"email\": \"testando2@testando.com.br\"\n\t\t}\n\t}\n}"
+        },
+        "parameters": [],
+        "headers": [{
+            "id": "pair_ced4177cb78e4765b447824b0dc70047",
+            "name": "",
+            "value": "",
+            "description": ""
+        }, {
+            "name": "Content-Type",
+            "value": "application/json",
+            "id": "pair_82d9c4c990344082b046d969e2f9cce6"
+        }],
+        "authentication": {},
+        "metaSortKey": -1647963984082,
+        "isPrivate": false,
+        "settingStoreCookies": true,
+        "settingSendCookies": true,
+        "settingDisableRenderRequestBody": false,
+        "settingEncodeUrl": true,
+        "settingRebuildPath": true,
+        "settingFollowRedirects": "global",
+        "_type": "request"
+    }, {
+        "_id": "env_9d37eb52059c2360a24731ba06b29530dd1faa95",
+        "parentId": "wrk_12c2b5256773445eb62fa3098896fc7e",
+        "modified": 1654714497477,
+        "created": 1628102005376,
+        "name": "Base Environment",
+        "data": {},
+        "dataPropertyOrder": {},
+        "color": null,
+        "isPrivate": false,
+        "metaSortKey": 1628102005376,
+        "_type": "environment"
+    }, {
+        "_id": "jar_9d37eb52059c2360a24731ba06b29530dd1faa95",
+        "parentId": "wrk_12c2b5256773445eb62fa3098896fc7e",
+        "modified": 1654714373401,
+        "created": 1628102005380,
+        "name": "Default Jar",
+        "_type": "cookie_jar"
+    }, {
+        "_id": "spc_3151c439afa44e2ca5abaa05a4b2200f",
+        "parentId": "wrk_12c2b5256773445eb62fa3098896fc7e",
+        "modified": 1628102005301,
+        "created": 1628102005301,
+        "fileName": "Insomnia",
+        "contents": "",
+        "contentType": "yaml",
+        "_type": "api_spec"
+    }, {
+        "_id": "env_e544ae42820746ec858991b03e8544d7",
+        "parentId": "env_9d37eb52059c2360a24731ba06b29530dd1faa95",
+        "modified": 1654718548156,
+        "created": 1654714517512,
+        "name": "orderformmediator",
+        "data": {
+            "base_ulr": "https://{workspace}--{account}.myvtex.com/orderformmediator"
+        },
+        "dataPropertyOrder": {
+            "&": ["base_ulr"]
+        },
+        "color": null,
+        "isPrivate": false,
+        "metaSortKey": 1654714517512,
+        "_type": "environment"
+    }]
+}
 ```
